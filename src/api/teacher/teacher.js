@@ -11,11 +11,22 @@ export default {
         })
     },
 
+    //按照id删除教师
     removeById(teacherId) {
         return request({
             url: `/eduservice/teacher/deleteById/${teacherId}`,
             method: 'delete',
         
         })
+    },
+
+    //新增教师
+    save(teacher) {
+        return request({
+            url: `/eduservice/teacher/add`,
+            method: 'post',
+            data: teacher
+        })
     }
+
 }
