@@ -55,7 +55,7 @@
                     <router-link :to="'/edu/teacher/edit' + scope.row.id">
                         <el-button type="primary" size="mini" icon="el-icon-edit">修改</el-button>
                     </router-link>
-                    <el-button type="danger" size="mini" icon="el-icon-delete">修改</el-button>
+                    <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeById(scope.row.id)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -106,11 +106,18 @@ export default {
             this.searchObj = {}
             this.getTeacherListPage()
         },
+        //切换页码
         handleCurrentChange(currentPage) {
             console.log("currentPage=" + currentPage)
             this.page = currentPage
             this.getTeacherListPage()
         },
+        //按id删除教师
+        removeById(id) {
+            teacher.removeById(id)
+            //删除后重新刷新教师列表页面
+            this.getTeacherListPage()
+        }
     },
     created() {
         this.getTeacherListPage()

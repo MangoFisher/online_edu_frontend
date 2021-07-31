@@ -9,5 +9,13 @@ export default {
             method: 'post',
             data: teacherQuery
         })
+    },
+
+    removeById(teacherId) {
+        return request({
+            url: `/eduservice/teacher/deleteById/${teacherId}`,
+            method: 'delete',
+        
+        })
     }
 }
