@@ -1,5 +1,38 @@
 <template>
     <div>
+        <!-- 查询表单 -->
+        <el-form :inline="true" :model="teacherQuery" class="demo-form-inline">
+            <el-form-item> 
+                <el-input v-model="teacherQuery.name" placeholder="讲师名"/>
+            </el-form-item>
+            <el-form-item> 
+                <el-select v-model="teacherQuery.level" clearable placeholder="讲师头衔"> 
+                    <el-option :value="1" label="高级讲师"/>
+                    <el-option :value="2" label="首席讲师"/>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="添加时间"> 
+                <el-date-picker
+                    v-model="teacherQuery.begin"
+                    type="datetime"
+                    placeholder="选择开始时间"
+                    value-format="yyyy-MM-dd HH:mm:ss"
+                    default-time="00:00:00">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item> 
+                <el-date-picker 
+                    v-model="teacherQuery.end"
+                    type="datetime"
+                    placeholder="选择截止时间"
+                    value-format="yyyy-MM-dd HH:mm:ss"
+                    default-time="00:00:00">
+                </el-date-picker>
+            </el-form-item>
+            <el-button type="primary" icon="el-icon-search" @click="getTeacherListPage">查 询</el-button> 
+            <el-button type="default" @click="resetQueryFild">清空</el-button>
+        </el-form>
+
         <el-table
             :data="teacherList"
             style="width: 100%"
@@ -27,13 +60,12 @@
             </el-table-column>
         </el-table>
         <!-- 分页 -->
-        <el-pagination
-            :current-page="page"
+         <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="page"
             :page-size="limit"
-            :total="total"
-            style="padding: 30px 0; text-align: center;"
-            layout="total, prev, pager, next, jumper"
-            @current-change="getTeacherListPage">
+            layout="total, prev, pager, next"
+            :total="total">
         </el-pagination>
     </div>
 </template>
@@ -47,13 +79,18 @@ export default {
             page: 1,
             limit: 5,
             total: 0,
-            teacherQuery: {}
+            teacherQuery: {
+                name: "",
+                level: "",
+                begin: null,
+                end: null
+            }
 
         }
     },
     methods: {
-        getTeacherListPage(page=1) {
-            this.page = page
+        getTeacherListPage() {
+            
             teacher.getTeacherListPage(this.page, this.limit, this.teacherQuery)
                     .then(response => {
                         console.log(response)
@@ -63,7 +100,17 @@ export default {
                     .catch(error => {
                         console.log(error)
                     })
-        }
+        },
+        //清空条件搜索输入框
+        resetQueryFild() {
+            this.searchObj = {}
+            this.getTeacherListPage()
+        },
+        handleCurrentChange(currentPage) {
+            console.log("currentPage=" + currentPage)
+            this.page = currentPage
+            this.getTeacherListPage()
+        },
     },
     created() {
         this.getTeacherListPage()
