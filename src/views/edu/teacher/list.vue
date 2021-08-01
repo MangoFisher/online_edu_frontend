@@ -52,7 +52,7 @@
             <el-table-column prop="sort" label="排序" width="60"></el-table-column>
             <el-table-column label="操作" width="200" align="center">
                 <template slot-scope="scope">
-                    <router-link :to="'/edu/teacher/edit' + scope.row.id">
+                    <router-link :to="'edit/' + scope.row.id">
                         <el-button type="primary" size="mini" icon="el-icon-edit">修改</el-button>
                     </router-link>
                     <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeById(scope.row.id)">删除</el-button>
@@ -93,7 +93,7 @@ export default {
             
             teacher.getTeacherListPage(this.page, this.limit, this.teacherQuery)
                     .then(response => {
-                        console.log(response)
+                        // console.log(response)
                         this.total = response.data.total
                         this.teacherList = response.data.rows
                     })
