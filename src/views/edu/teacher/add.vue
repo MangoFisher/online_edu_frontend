@@ -41,7 +41,7 @@
                     :width="300"
                     :height="300"
                     :key="imagecropperKey"
-                    :url="'BASE_API' + '/serviceoss/file/upload'"
+                    :url="BASE_API + '/serviceoss/file/upload'"
                     field="file"
                     @close="close"
                     @crop-upload-success="cropSuccess"/>
@@ -76,7 +76,7 @@ export default {
             imagecropperShow: false,
             imagecropperKey: 0,
             //从配置文件中取值
-            BASE_API: process.env.BASE_API,
+            BASE_API: process.env.VUE_APP_OSS_BASE_API,
            
         }
     },
@@ -108,12 +108,14 @@ export default {
         //上传成功后的回调函数
         cropSuccess(data) {
             this.imagecropperShow = false
-            this.avatar = data.url //相当于response.data.url
+            this.teacher.avatar = data.url //相当于response.data.url
         }
 
     },
     created() {
         //新增和修改使用同一个组件add.vue,所以需要通过判断路由中是否有id字段来区分
+        // console.log(process.env)
+        // console.log(process.env.VUE_APP_OSS_BASE_API)
         if(this.$route.params && this.$route.params.id) {
             const id = this.$route.params.id
             this.getInfoById(id)
