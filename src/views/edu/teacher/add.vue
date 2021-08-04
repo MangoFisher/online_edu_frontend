@@ -104,11 +104,15 @@ export default {
         //关闭上传弹窗
         close() {
             this.imagecropperShow = false
+            //对图片上传组件重新进行初始化
+            this.imagecropperKey = this.imagecropperKey + 1
         },
         //上传成功后的回调函数
         cropSuccess(data) {
             this.imagecropperShow = false
             this.teacher.avatar = data.url //相当于response.data.url
+            //对图片上传组件重新进行初始化
+            this.imagecropperKey = this.imagecropperKey + 1
         }
 
     },
