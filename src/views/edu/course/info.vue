@@ -11,7 +11,19 @@
                 <el-input v-model="courseInfo.title" placeholder=" 示例：机器学习项目课：从基础到搭建项目视"/>
             </el-form-item>
             <!-- 所属分类 TODO -->
-            <!-- 课程讲师 TODO -->
+            <!-- 课程讲师 -->
+            <el-form-item label="课程讲师"> 
+                <el-select
+                    v-model="courseInfo.teacherId"
+                    placeholder="请选择"> 
+                    <el-option
+                        v-for="teacher in teacherList"
+                        :key="teacher.id"
+                        :label="teacher.name"
+                        :value="teacher.id"/>
+                </el-select>
+            </el-form-item>
+
             <el-form-item label="总课时"> 
                 <el-input-number :min="0" v-model="courseInfo.lessonNum" controls-position="right" placeholder=""/>
             </el-form-item>
@@ -29,6 +41,7 @@
 
 <script>
 import course from '@/api/course/course'
+import teacher from '@/api/teacher/teacher'
 export default {
     data() {
         return {
@@ -43,7 +56,8 @@ export default {
                 description: '',
                 cover: '',
                 price: 0
-            }
+            },
+            teacherList: []
         }
     },
     methods: {
@@ -57,8 +71,17 @@ export default {
                     })
                     this.$router.push('/course/chapter/' + response.data.courseId) 
                 }) 
+        },
+        //获取所有讲师列表
+        getAllTeacherList() {
+            teacher.getAllTeacherList()
+                .then(response => {
+                    this.teacherList = response.data.teachers
+                })
         }
     },
-    created() {}
+    created() {
+        this.getAllTeacherList()
+    }
 }
 </script>

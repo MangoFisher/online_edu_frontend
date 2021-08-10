@@ -44,6 +44,14 @@ export default {
             url: `/eduservice/teacher/getTeacherById/${id}`,
             method: 'get',
         })
+    },
+
+    //查询所有讲师
+    getAllTeacherList() {
+        return request({
+            url: '/eduservice/teacher/findAll',
+            method: 'get'
+        })
     }
 
 
