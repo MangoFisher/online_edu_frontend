@@ -11,6 +11,28 @@
                 <el-input v-model="courseInfo.title" placeholder=" 示例：机器学习项目课：从基础到搭建项目视"/>
             </el-form-item>
             <!-- 所属分类 TODO -->
+            <el-form-item label="课程分类"> 
+                <el-select
+                    v-model="courseInfo.subjectParentId"
+                    placeholder="一级分类"
+                    @change="handleChange"> 
+                    <el-option
+                        v-for="subject in oneSubjectList"
+                        :key="subject.id"
+                        :label="subject.title"
+                        :value="subject.id"/>
+                </el-select>
+            
+                <el-select
+                    v-model="courseInfo.subjectId"
+                    placeholder="二级分类"> 
+                    <el-option
+                        v-for="subject in twoSubjectList"
+                        :key="subject.id"
+                        :label="subject.title"
+                        :value="subject.id"/>
+                </el-select>
+            </el-form-item>
             <!-- 课程讲师 -->
             <el-form-item label="课程讲师"> 
                 <el-select
@@ -42,6 +64,7 @@
 <script>
 import course from '@/api/course/course'
 import teacher from '@/api/teacher/teacher'
+import subject from '@/api/subject/subject'
 export default {
     data() {
         return {
@@ -51,13 +74,16 @@ export default {
             courseInfo: {
                 title: '',
                 subjectId: '',
+                subjectParentId: '',
                 teacherId: '',
                 lessonNum: 0,
                 description: '',
                 cover: '',
                 price: 0
             },
-            teacherList: []
+            teacherList: [],
+            oneSubjectList: [], //一级分类列表
+            twoSubjectList: []
         }
     },
     methods: {
@@ -78,10 +104,28 @@ export default {
                 .then(response => {
                     this.teacherList = response.data.teachers
                 })
+        },
+        //获取所有一级分类列表(二级分类的数据也存在于一级分类的children字段中)
+        getAllSubject() {
+            subject.getAllSubject()
+                .then(response => {
+                    this.oneSubjectList = response.data.list
+                })
+        },
+        //一级分类选择器发生变化
+        handleChange() {
+            this.courseInfo.subjectId = ''
+            for (var i=0; i<this.oneSubjectList.length; i++) {
+                var oneSubject = this.oneSubjectList[i]
+                if(this.courseInfo.subjectParentId === oneSubject.id) {
+                    this.twoSubjectList = oneSubject.children
+                }
+            }
         }
     },
     created() {
         this.getAllTeacherList()
+        this.getAllSubject()
     }
 }
 </script>
