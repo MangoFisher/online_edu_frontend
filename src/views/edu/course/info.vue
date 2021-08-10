@@ -50,7 +50,21 @@
                 <el-input-number :min="0" v-model="courseInfo.lessonNum" controls-position="right" placeholder=""/>
             </el-form-item>
             <!-- 课程简介 TODO -->
-            <!-- 课程封面 TODO -->
+            <!-- 课程封面-->
+            <el-form-item label="课程封面">
+                <el-upload
+                    :action="BASE_API + '/serviceoss/file/upload'"
+                    :on-change="handleUploadChange"
+                    :on-success="handleAvatarSuccess"
+                    :before-upload="beforeAvatarUpload"
+                    :limit="1"
+                    >
+                <el-button size="small" type="primary">点击上传</el-button>
+                <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过**kb</div>
+                </el-upload>
+            </el-form-item>
+
+
             <el-form-item label="课程价格"> 
                 <el-input-number :min="0" v-model="courseInfo.price" controls-position="right" placeholder=""/>
             </el-form-item> 
@@ -83,7 +97,9 @@ export default {
             },
             teacherList: [],
             oneSubjectList: [], //一级分类列表
-            twoSubjectList: []
+            twoSubjectList: [],
+            BASE_API: process.env.VUE_APP_OSS_BASE_API,
+            uploadFileList: []
         }
     },
     methods: {
@@ -121,6 +137,26 @@ export default {
                     this.twoSubjectList = oneSubject.children
                 }
             }
+        },
+        //文件上传成功
+        handleAvatarSuccess(res, file) {
+            this.courseInfo.cover = res.data.url
+        },
+        //文件上传前
+        beforeAvatarUpload(file) {
+            const isJPG = file.type === 'img/jpeg'
+            const isLt2M = (file.size / 1024 / 1024) < 100
+            console.log(file.size)
+            if(false) {
+                this.$message.error("图片不是jpeg格式")
+            } 
+            if(!isLt2M) {
+                this.$message.error("图片大小不能超过100M")
+            }
+            return true
+        },
+        handleUploadChange(file, fileList) {
+            this.uploadFileList = fileList.slice(-3);
         }
     },
     created() {
