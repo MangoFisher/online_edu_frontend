@@ -49,7 +49,10 @@
             <el-form-item label="总课时"> 
                 <el-input-number :min="0" v-model="courseInfo.lessonNum" controls-position="right" placeholder=""/>
             </el-form-item>
-            <!-- 课程简介 TODO -->
+            <!-- 课程简介-->
+            <el-form-item label="课程简介">
+                <el-input v-model="courseInfo.description" placeholder="课程简介"></el-input>
+            </el-form-item>
             <!-- 课程封面-->
             <el-form-item label="课程封面">
                 <el-upload
