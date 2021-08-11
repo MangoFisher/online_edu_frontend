@@ -51,7 +51,9 @@
             </el-form-item>
             <!-- 课程简介-->
             <el-form-item label="课程简介">
-                <el-input v-model="courseInfo.description" placeholder="课程简介"></el-input>
+                <editor :init="tinyInit" v-model="courseInfo.description">
+
+                </editor>
             </el-form-item>
             <!-- 课程封面-->
             <el-form-item label="课程封面">
@@ -82,7 +84,13 @@
 import course from '@/api/course/course'
 import teacher from '@/api/teacher/teacher'
 import subject from '@/api/subject/subject'
+
+import axios from 'axios'
+import Editor from '@tinymce/tinymce-vue'
 export default {
+    components: {
+      'editor': Editor
+    },
     data() {
         return {
             saveBtnDisabled: false,
@@ -102,7 +110,54 @@ export default {
             oneSubjectList: [], //一级分类列表
             twoSubjectList: [],
             BASE_API: process.env.VUE_APP_OSS_BASE_API,
-            uploadFileList: []
+            uploadFileList: [],
+            tinyInit: {
+
+                        language_url: '/tinymce/zh_CN.js', //中文包
+                        language: 'zh_CN', //中文
+                        height: 500,
+                        menubar: false,
+                        plugins: [
+                        'advlist autolink lists link image charmap print preview anchor',
+                        'searchreplace visualblocks code fullscreen',
+                        'insertdatetime media table paste code help wordcount'
+                        ],
+                        toolbar:
+                        'image | undo redo | formatselect | bold italic backcolor | \
+                        alignleft aligncenter alignright alignjustify | \
+                        bullist numlist outdent indent | removeformat | help',
+                        browser_spellcheck: true, // 拼写检查
+                        branding: false, // 去水印
+                        elementpath: true, //禁用编辑器底部的状态栏
+                        statusbar: true, // 隐藏编辑器底部的状态栏
+                        paste_data_images: true, // 是否允许粘贴图像
+                        menubar: true, // 隐藏最上方menu
+                        fontsize_formats: '14px 16px 18px 20px 24px 26px 28px 30px 32px 36px', //字体大小
+                        font_formats:'微软雅黑=Microsoft YaHei,Helvetica Neue;PingFang SC;sans-serif;苹果苹方=PingFang SC,Microsoft YaHei,sans-serif;宋体=simsun;serifsans-serif;Terminal=terminal;monaco;Times New Roman=times new roman;times', //字体
+                        file_picker_types: 'image',
+                        images_upload_credentials: false,
+
+                        // 图片上传三个参数，图片数据，成功时的回调函数，失败时的回调函数
+                        images_upload_handler: function(blobInfo, success, failure) {
+                            let formdata = new FormData();
+                            console.log(blobInfo)
+                            formdata.append("file", blobInfo.blob(), blobInfo.filename());
+
+
+
+                            // 上传图片接口，跟后端同事协调上传图片
+                            // http://hh.xxxx.cn/admin/upload为上传图片接口
+                            axios.post('http://localhost:8002/serviceoss/file/upload',formdata)
+                            .then(function(res) {
+                                console.log(res.data.url)
+                                success(res.data.url);
+                            }).catch(res => {
+                            failure("error");
+                            });
+                        }
+                    
+            }
+            
         }
     },
     methods: {
@@ -166,5 +221,6 @@ export default {
         this.getAllTeacherList()
         this.getAllSubject()
     }
+    
 }
 </script>
