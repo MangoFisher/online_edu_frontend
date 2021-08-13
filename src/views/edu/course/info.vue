@@ -156,21 +156,30 @@ export default {
                             });
                         }
                     
-            }
+            },
+            courseId: ''
             
         }
     },
     methods: {
         //保存并下一步
         next() {
-            course.addCourse(this.courseInfo)
+            if(this.$route.params && this.$route.params.id) {
+                this.updateCourseInfo()
+            } else {
+                course.addCourse(this.courseInfo)
                 .then(response => {
                     this.$message({
                         type: 'success',
                         message: '添加课程信息成功'
                     })
-                    this.$router.push('/course/chapter/' + response.data.courseId) 
+                    // this.$router.push('/course/chapter/' + response.data.courseId) 
                 }) 
+            }
+            this.$router.push('/course/chapter/' + this.courseId) 
+
+            
+            
         },
         //获取所有讲师列表
         getAllTeacherList() {
@@ -215,11 +224,45 @@ export default {
         },
         handleUploadChange(file, fileList) {
             this.uploadFileList = fileList.slice(-3);
+        },
+        //根据id查询课程信息
+        getCourseInfo() {
+            course.getCourseInfo(this.courseId)
+                .then(response => {
+                    this.courseInfo = response.data.courseInfoVo
+                    subject.getAllSubject()
+                        .then(response => {
+                            this.oneSubjectList = response.data.list
+                            for(var i=0; i<this.oneSubjectList.length; i++) {
+                                var oneSubject = this.oneSubjectList[i]
+                                if(this.courseInfo.subjectParentId == oneSubject.id) {
+                                    this.twoSubjectList = oneSubject.children
+                                }
+                            }
+                        })
+                })
+        },
+        //更新课程信息
+        updateCourseInfo() {
+            course.updateCourseInfo(this.courseInfo)
+                .then(response => {
+                    this.$message({
+                        type: 'success',
+                        message: '修改课程信息成功'
+                    })
+                })
         }
     },
     created() {
-        this.getAllTeacherList()
-        this.getAllSubject()
+        //获取路由中的id值
+        if(this.$route.params && this.$route.params.id) {
+            this.courseId = this.$route.params.id
+            this.getCourseInfo()
+        } else {
+            this.getAllTeacherList()
+            this.getAllSubject()
+        }
+        
     }
     
 }
