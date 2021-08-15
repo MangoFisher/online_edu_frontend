@@ -16,9 +16,9 @@
                 <p>
                     {{ chapter.title }}
                     <span class="acts">
-                        <el-button type="text">添加课时</el-button> 
-                        <el-button style="" type="text">编辑</el-button>
-                        <el-button type="text">删除</el-button>
+                        <el-button type="primary" size="mini">添加课时</el-button> 
+                        <el-button type="primary" size="mini" @click="editChapter(chapter.id)">编辑</el-button>
+                        <el-button type="danger" size="mini">删除</el-button>
                     </span>
                 </p>
                 <!-- 视频 -->
@@ -69,6 +69,7 @@ export default {
         return {
             saveBtnDisabled: false,
             chapterVideoList: [],
+            chapterId: '',
             courseId: '',
             dialogChapterFormVisible: false,
             chapterInfo: {
@@ -101,8 +102,8 @@ export default {
                 })
         },
 
-        //添加或更新章节
-        chapterSaveOrUpdate() {
+        //添加章节
+        addChapter() {
             chapter.addChapter(this.chapterInfo)
                 .then(response => {
                     //关闭弹窗
@@ -116,8 +117,47 @@ export default {
                     this.getChapterVideo()
                 })
         },
+
+        //更新章节
+        updateChapter() {
+            this.chapterInfo.id = this.chapterId
+            chapter.updateChapter(this.chapterInfo)
+                .then(response => {
+                    //关闭弹窗
+                    this.dialogChapterFormVisible = false
+                    //提示
+                    this.$message({
+                        type: 'success',
+                        message: '修改章节成功'
+                    })
+                    //刷新页面
+                    this.getChapterVideo()
+                })
+        },
+
+        //添加或更新章节
+        chapterSaveOrUpdate() {
+            if(this.$route.params && this.$route.params.id) {
+                this.updateChapter()
+            } else {
+                this.addChapter()
+            }
+        },
         addClick() {
             this.dialogChapterFormVisible = true
+            this.chapterInfo.title = ''
+            this.chapterInfo.sort = 0
+        },
+        //编辑章节
+        editChapter(chapterId) {
+            this.dialogChapterFormVisible = true
+            this.chapterId = chapterId
+            chapter.getChapterInfo(chapterId)
+                .then(response => {
+                    this.chapterInfo.title = response.data.chapter.title
+                    this.chapterInfo.sort = response.data.chapter.sort
+                })
+            // this.updateChapter()
         }
 
     }
@@ -137,7 +177,6 @@ export default {
 }
 
 .chanpterList p{
-    float: left;
     font-size: 20px;
     margin: 10px 0;
     padding: 10px;
