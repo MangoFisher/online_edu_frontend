@@ -166,6 +166,7 @@ export default {
         next() {
             if(this.$route.params && this.$route.params.id) {
                 this.updateCourseInfo()
+                this.$router.push('/course/chapter/' + this.courseId) 
             } else {
                 course.addCourse(this.courseInfo)
                 .then(response => {
@@ -173,10 +174,9 @@ export default {
                         type: 'success',
                         message: '添加课程信息成功'
                     })
-                    // this.$router.push('/course/chapter/' + response.data.courseId) 
+                    this.$router.push('/course/chapter/' + response.data.courseId) 
                 }) 
             }
-            this.$router.push('/course/chapter/' + this.courseId) 
 
             
             
