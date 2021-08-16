@@ -18,7 +18,7 @@
                     <span class="acts">
                         <el-button type="primary" size="mini">添加课时</el-button> 
                         <el-button type="primary" size="mini" @click="editChapter(chapter.id)">编辑</el-button>
-                        <el-button type="danger" size="mini">删除</el-button>
+                        <el-button type="danger" size="mini" @click="deleteChapter(chapter.id)">删除</el-button>
                     </span>
                 </p>
                 <!-- 视频 -->
@@ -72,6 +72,7 @@ export default {
             chapterId: '',
             courseId: '',
             dialogChapterFormVisible: false,
+            addFlag: false,
             chapterInfo: {
                 title: '',
                 sort: '',
@@ -137,16 +138,19 @@ export default {
 
         //添加或更新章节
         chapterSaveOrUpdate() {
-            if(this.$route.params && this.$route.params.id) {
+            if(!this.addFlag) {
                 this.updateChapter()
             } else {
                 this.addChapter()
             }
+            this.addFlag = false
         },
         addClick() {
             this.dialogChapterFormVisible = true
             this.chapterInfo.title = ''
             this.chapterInfo.sort = 0
+            this.addFlag = true
+            
         },
         //编辑章节
         editChapter(chapterId) {
@@ -158,7 +162,27 @@ export default {
                     this.chapterInfo.sort = response.data.chapter.sort
                 })
             // this.updateChapter()
-        }
+        },
+        //删除章节
+        deleteChapter(chapterId) {
+            chapter.deleteChapterById(chapterId)
+                .then(response => {
+                    this.$message({
+                        type: 'warn',
+                        message: '删除章节成功'
+                    })
+                })
+            this.getChapterVideo()
+            
+        },
+
+        // getChapterInfo(chapterId) {
+        //     chapter.getChapterInfo(chapterId)
+        //         .then(response => {
+        //             console.log(response.data.chapter)
+        //             this.chapterInfo = response.data.chapter
+        //         })
+        // }
 
     }
 }
