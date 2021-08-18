@@ -37,12 +37,17 @@
             </li>
         </ul>
 
-        <el-form label-width="120px"> 
+        <div>
+            <el-button @click="previous">上一步</el-button> 
+            <el-button :disabled="saveBtnDisabled" type="primary" @click="next">下一步</el-button>
+        </div>
+
+        <!-- <el-form label-width="120px"> 
             <el-form-item> 
                 <el-button @click="previous">上一步</el-button> 
                 <el-button :disabled="saveBtnDisabled" type="primary" @click="next">下一步</el-button>
             </el-form-item>
-        </el-form>
+        </el-form> -->
 
         <!-- 添加和修改章节表单 -->
         <el-dialog :visible.sync="dialogChapterFormVisible" title="添加章节"> 
@@ -130,7 +135,7 @@ export default {
             this.$router.push({ path: '/course/info/' + this.courseId })
         },
         next() {
-            this.$router.push('/course/publish/1') 
+            this.$router.push('/course/publish/' + this.courseId) 
         },
         //获取指定课程的章节和小节
         getChapterVideo() {
