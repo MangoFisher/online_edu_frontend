@@ -225,7 +225,7 @@ export default {
         handleUploadChange(file, fileList) {
             this.uploadFileList = fileList.slice(-3);
         },
-        //根据id查询课程信息
+        //根据id查询课程基本信息
         getCourseInfo() {
             course.getCourseInfo(this.courseId)
                 .then(response => {

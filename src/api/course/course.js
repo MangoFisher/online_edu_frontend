@@ -9,7 +9,7 @@ export default {
         })
     },
 
-    //根据课程id查询课程信息
+    //根据课程id查询课程基本信息
     getCourseInfo(courseId){
         return request({
             url: `/eduservice/course/getCourseInfo/${courseId}`,

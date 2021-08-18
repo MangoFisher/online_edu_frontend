@@ -16,7 +16,7 @@
                 <p>
                     {{ chapter.title }}
                     <span class="acts">
-                        <el-button type="primary" size="mini">添加课时</el-button> 
+                        <el-button type="primary" size="mini" @click="openVideoDialog(chapter.id)">添加课时</el-button> 
                         <el-button type="primary" size="mini" @click="editChapter(chapter.id)">编辑</el-button>
                         <el-button type="danger" size="mini" @click="deleteChapter(chapter.id)">删除</el-button>
                     </span>
@@ -28,8 +28,8 @@
                         :key="video.id"> 
                         <p>{{ video.title }}
                             <span class="acts"> 
-                                <el-button type="text">编辑</el-button> 
-                                <el-button type="text">删除</el-button>
+                                <el-button type="text" @click="editVideo(video.id)">编辑</el-button> 
+                                <el-button type="text" @click="deleteVideo(video.id)">删除</el-button>
                             </span>
                         </p>
                     </li>
@@ -59,11 +59,38 @@
                 <el-button type="primary" @click="chapterSaveOrUpdate">确 定</el-button>
             </div>
         </el-dialog>
+
+        <!-- 添加和修改课时表单 -->
+        <el-dialog :visible.sync="dialogVideoFormVisible" title="添加课时" @close="closeVideoDialog">
+            <el-form  :model="video" ref="videoFormRef" label-width="120px">
+                <el-form-item label="课时标题" prop="课时标题"> 
+                    <el-input v-model="video.title"/>
+                </el-form-item>
+                <el-form-item label="课时排序" prop="课时排序"> 
+                    <el-input-number v-model="video.sort" :min="0" controls-position="right"/>
+                </el-form-item>
+                <el-form-item label="是否免费" prop="是否免费"> 
+                    <el-radio-group v-model="video.isFree"> 
+                        <el-radio :label="true">免费</el-radio> 
+                        <el-radio :label="false">默认</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="上传视频" prop="上传视频">
+                    <!-- TODO -->
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer"> 
+                <el-button @click="dialogVideoFormVisible = false">取 消</el-button> 
+                <el-button :disabled="saveVideoBtnDisabled" type="primary" @click="saveOrUpdateVideo">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
 <script>
 import chapter from '@/api/chapter'
+import video from '@/api/video'
+import course from '@/api/course/course'
 export default {
     data() {
         return {
@@ -72,13 +99,23 @@ export default {
             chapterId: '',
             courseId: '',
             dialogChapterFormVisible: false,
-            addFlag: false,
+            addVideoFlag: false,
             chapterInfo: {
                 title: '',
                 sort: '',
                 courseId: this.$route.params.id
 
-            }
+            },
+            video: {
+                title: '',
+                sort: 0,
+                isFree: 0,
+                videoSourceId: ''
+            },
+            videoCopy: {},
+            dialogVideoFormVisible: false,
+            saveVideoBtnDisabled: false,
+            addFlag: false
         }
     },
     created() {
@@ -175,15 +212,98 @@ export default {
             this.getChapterVideo()
             
         },
+        /******************************小节操作**************************************/
+        //打开增加课时的对话框
+        openVideoDialog(chapterId) {
+            // console.log(this)
+            // this.resetForm(this.$refs.resetForm)
+        
+            this.dialogVideoFormVisible = true
+            this.video.chapterId = chapterId
+            this.addVideoFlag = true
+        },
 
-        // getChapterInfo(chapterId) {
-        //     chapter.getChapterInfo(chapterId)
-        //         .then(response => {
-        //             console.log(response.data.chapter)
-        //             this.chapterInfo = response.data.chapter
-        //         })
-        // }
+        //增加课时的执行函数
+        addVideo(){
+            this.video.courseId = this.courseId
+            video.addVideo(this.video)
+                .then(response => {
+                    this.dialogVideoFormVisible = false
+                    this.$message({
+                        type: 'success',
+                        message: '添加小节成功'
+                    })
+                    this.getChapterVideo()
+                })
+        },
 
+        saveOrUpdateVideo() {
+            if(this.addVideoFlag) {
+                this.addVideo()
+                this.addVideoFlag = false
+            } else {
+                // this.editVideo()
+                this.videoCopy.title = this.video.title
+                this.videoCopy.sort = this.video.sort
+                this.videoCopy.isFree = this.video.isFree
+
+                video.updateVideo(this.videoCopy)
+                    .then(response => {
+                        this.$message({
+                            type: 'success',
+                            message: '编辑课时成功'
+                        })
+                    })
+            }
+            this.dialogVideoFormVisible = false
+            course.getCourseInfo(this.courseId)
+            // this.$refs['videoFormRef'].resetFields()
+        },
+
+        closeVideoDialog() {
+            //重置表单
+            this.$refs.videoFormRef.resetFields()
+            this.video.title = ''
+            this.video.sort = 0
+            this.video.isFree = 0
+        },
+
+        //根据id查询课时
+        getVideo(videoId) {
+            video.getVideo(videoId)
+                .then(response => {
+                    this.videoCopy = response.data.video
+                    // console.log(this.videoCopy)
+                    console.log(this.videoCopy.title)
+                    this.video.title = this.videoCopy.title
+                    this.video.sort = this.videoCopy.sort
+                    this.video.isFree = this.videoCopy.isFree
+                    // console.log(this.video)
+                })
+        },
+
+        //编辑课时
+        editVideo(videoId) {
+            this.dialogVideoFormVisible = true
+            // console.log(videoId)
+            this.getVideo(videoId)
+        },
+
+        //删除课时
+        deleteVideo(videoId) {
+            video.deleteVideoById(videoId)
+                .then(response => {
+                    this.$message({
+                        type: 'warn',
+                        message: '删除课时成功'
+                    })
+                })
+            this.getChapterVideo()
+        }
+
+
+
+        
     }
 }
 </script>
@@ -220,7 +340,7 @@ export default {
 }
 
 .videoList p{
-    float: left;
+    // float: left;
     font-size: 14px;
     margin: 10px 0;
     padding: 10px;
