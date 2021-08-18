@@ -42,7 +42,15 @@ export default {
             this.$router.push({ path: '/course/chapter/1' })
         },
         publish() {
-            this.$router.push({ path: '/course/list' })
+            course.publishCourse(this.courseId)
+                .then(response => {
+                    this.$message({
+                        type: 'success',
+                        message: '课程发布成功'
+                    })
+                    this.$router.push({ path: '/course/list' })
+                })
+            
         },
 
         //根据课程id查询课程确认信息
