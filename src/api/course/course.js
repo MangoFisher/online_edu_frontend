@@ -41,5 +41,22 @@ export default {
             method: 'post', //注意这里不需要写data字段哦！！！！
             
         })
+    },
+
+    //获取所有课程列表
+    getCourseList() {
+        return request({
+            url: '/eduservice/course/getCourseList',
+            method: 'get',
+        })
+    },
+
+    //TODO条件查询课程
+    getPageCourseList(current, limit, searchObj) {
+        return request({
+            url: `/eduservice/course/getPageCourseList/${current}/${limit}`,
+            method: 'post',
+            data: searchObj
+        })
     }
 }
