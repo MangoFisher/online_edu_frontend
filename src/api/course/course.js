@@ -58,5 +58,13 @@ export default {
             method: 'post',
             data: searchObj
         })
+    },
+
+    //根据课程id删除课程、简介、章节、小节
+    deleteCourseById(courseId) {
+        return request({
+            url: '/eduservice/course/deleteCourseById/' + courseId,
+            method: 'delete',
+        })
     }
 }
