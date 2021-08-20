@@ -116,6 +116,7 @@
 import chapter from '@/api/chapter'
 import video from '@/api/video'
 import course from '@/api/course/course'
+import vod from '@/api/vod'
 export default {
     data() {
         return {
@@ -131,10 +132,12 @@ export default {
                 courseId: this.$route.params.id
 
             },
+            //video其实是小节的数据结构
             video: {
                 title: '',
                 sort: 0,
                 isFree: 0,
+                //上传到阿里云的视频的id
                 videoSourceId: '',
                 videoOriginalName: ''
             },
@@ -142,7 +145,8 @@ export default {
             dialogVideoFormVisible: false,
             saveVideoBtnDisabled: false,
             addFlag: false,
-            BASE_API: process.env.VUE_APP_VOD_BASE_API
+            BASE_API: process.env.VUE_APP_VOD_BASE_API,
+            fileList: [],//上传视频文件列表
         }
     },
     created() {
@@ -345,7 +349,7 @@ export default {
 
         handleVodRemove(file, fileList) {
             // console.log(file)
-            vod.removeById(this.video.videoSourceId).then(response=>{
+            vod.deleteAliyunVideo(this.video.videoSourceId).then(response=>{
                 this.$message({
                 type: 'success',
                 message: response.message
