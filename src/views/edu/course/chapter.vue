@@ -76,8 +76,8 @@
                 </el-form-item>
                 <el-form-item label="是否免费" prop="是否免费"> 
                     <el-radio-group v-model="video.isFree"> 
-                        <el-radio :label="true">免费</el-radio> 
-                        <el-radio :label="false">默认</el-radio>
+                        <el-radio :label="1">免费</el-radio> 
+                        <el-radio :label="0">默认</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="上传视频" prop="上传视频">
@@ -141,12 +141,12 @@ export default {
                 videoSourceId: '',
                 videoOriginalName: ''
             },
-            videoCopy: {},
             dialogVideoFormVisible: false,
             saveVideoBtnDisabled: false,
+            //添加小节或者编辑小节的标志
             addFlag: false,
             BASE_API: process.env.VUE_APP_VOD_BASE_API,
-            fileList: [],//上传视频文件列表
+            fileList: [],//小节中上传视频文件列表
         }
     },
     created() {
@@ -246,9 +246,6 @@ export default {
         /******************************小节操作**************************************/
         //打开增加课时的对话框
         openVideoDialog(chapterId) {
-            // console.log(this)
-            // this.resetForm(this.$refs.resetForm)
-        
             this.dialogVideoFormVisible = true
             this.video.chapterId = chapterId
             this.addVideoFlag = true
@@ -266,25 +263,27 @@ export default {
                     })
                     this.getChapterVideo()
                 })
+            this.addFlag = false
+            this.video = {}
         },
 
         saveOrUpdateVideo() {
             if(this.addVideoFlag) {
                 this.addVideo()
-                this.addVideoFlag = false
             } else {
                 // this.editVideo()
-                this.videoCopy.title = this.video.title
-                this.videoCopy.sort = this.video.sort
-                this.videoCopy.isFree = this.video.isFree
+                // this.videoCopy.title = this.video.title
+                // this.videoCopy.sort = this.video.sort
+                // this.videoCopy.isFree = this.video.isFree
 
-                video.updateVideo(this.videoCopy)
+                video.updateVideo(this.video)
                     .then(response => {
                         this.$message({
                             type: 'success',
                             message: '编辑课时成功'
                         })
                     })
+                this.video = {}
             }
             this.dialogVideoFormVisible = false
             course.getCourseInfo(this.courseId)
@@ -303,20 +302,22 @@ export default {
         getVideo(videoId) {
             video.getVideo(videoId)
                 .then(response => {
-                    this.videoCopy = response.data.video
-                    // console.log(this.videoCopy)
-                    console.log(this.videoCopy.title)
-                    this.video.title = this.videoCopy.title
-                    this.video.sort = this.videoCopy.sort
-                    this.video.isFree = this.videoCopy.isFree
-                    // console.log(this.video)
+                    this.video = response.data.video
+                    //！！！注意再次给el-upload组件的fileList重新赋值的方法
+                    const tmpList = []
+                    tmpList.push(this.video.videoOriginalName)
+                    this.fileList = tmpList.map(item => {
+                        return {
+                            name: item,
+                            url: item
+                        }
+                    })
                 })
         },
 
         //编辑课时
         editVideo(videoId) {
             this.dialogVideoFormVisible = true
-            // console.log(videoId)
             this.getVideo(videoId)
         },
 
@@ -334,8 +335,7 @@ export default {
 
         //成功回调
         handleVodUploadSuccess(response, file, fileList) {
-            // console.log(file)
-            // console.log(fileList)
+            this.video.videoOriginalName = file.name
             this.video.videoSourceId = response.data.videoId
         },
 
@@ -348,7 +348,6 @@ export default {
         },
 
         handleVodRemove(file, fileList) {
-            // console.log(file)
             vod.deleteAliyunVideo(this.video.videoSourceId).then(response=>{
                 this.$message({
                 type: 'success',
