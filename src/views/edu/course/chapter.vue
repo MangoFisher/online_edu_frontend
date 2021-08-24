@@ -240,6 +240,9 @@ export default {
                         type: 'warn',
                         message: '删除章节成功'
                     })
+                    //2.如果this.getChapterVideo()写在then函数体的外面，则有可能
+                    //页面无法及时刷新
+                    this.getChapterVideo() 
                 })
             //1.this.getChapterVideo()
             
