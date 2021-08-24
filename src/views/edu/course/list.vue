@@ -66,7 +66,7 @@
                 <template slot-scope="scope"> 
                     <div class="info"> 
                         <div class="pic"> 
-                            <img :src="scope.row.cover" alt="scope.row.title" width="150px">
+                            <img :src="scope.row.cover" alt="没有上传头像" width="150px">
                         </div> 
                         <div class="title"> 
                             <a href="">{{ scope.row.title }}</a>
