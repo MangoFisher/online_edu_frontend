@@ -56,7 +56,7 @@
                     <el-input v-model="chapterInfo.title"/>
                 </el-form-item> 
                 <el-form-item label="章节排序"> 
-                    <el-input-number v-model="chapterInfo.sort" :min="0" position="right"/>
+                    <el-input-number v-model="chapterInfo.sort" :min="0" :max="1" position="right"/>
                 </el-form-item>
             </el-form> 
             <div slot="footer" class="dialog-footer"> 
@@ -72,7 +72,7 @@
                     <el-input v-model="video.title"/>
                 </el-form-item>
                 <el-form-item label="课时排序" prop="课时排序"> 
-                    <el-input-number v-model="video.sort" :min="0" controls-position="right"/>
+                    <el-input-number v-model="video.sort" :min="0" :max="1" controls-position="right"/>
                 </el-form-item>
                 <el-form-item label="是否免费" prop="是否免费"> 
                     <el-radio-group v-model="video.isFree"> 
