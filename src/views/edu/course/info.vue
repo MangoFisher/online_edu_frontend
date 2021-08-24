@@ -63,6 +63,7 @@
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
                     :limit="1"
+                    :file-list="coverFileList"
                     >
                 <el-button size="small" type="primary">点击上传</el-button>
                 <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过**kb</div>
@@ -157,7 +158,8 @@ export default {
                         }
                     
             },
-            courseId: ''
+            courseId: '',
+            coverFileList: []
             
         }
     },
@@ -230,6 +232,16 @@ export default {
             course.getCourseInfo(this.courseId)
                 .then(response => {
                     this.courseInfo = response.data.courseInfoVo
+                    const tmpList = []
+                    tmpList.push(this.courseInfo.cover)
+                    this.coverFileList = tmpList.map(item => {
+                        return {
+                            name: item,
+                            url: item
+                        }
+                    })
+
+
                     subject.getAllSubject()
                         .then(response => {
                             this.oneSubjectList = response.data.list
@@ -258,6 +270,7 @@ export default {
         if(this.$route.params && this.$route.params.id) {
             this.courseId = this.$route.params.id
             this.getCourseInfo()
+            this.getAllTeacherList()
         } else {
             this.getAllTeacherList()
             this.getAllSubject()
