@@ -68,13 +68,13 @@
         <!-- 添加和修改课时表单 -->
         <el-dialog :visible.sync="dialogVideoFormVisible" title="添加课时" @close="closeVideoDialog">
             <el-form  :model="video" ref="videoFormRef" label-width="120px">
-                <el-form-item label="课时标题" prop="课时标题"> 
+                <el-form-item label="课时标题"> 
                     <el-input v-model="video.title"/>
                 </el-form-item>
-                <el-form-item label="课时排序" prop="课时排序"> 
-                    <el-input-number v-model="video.sort" :min="0" :max="1" controls-position="right"/>
+                <el-form-item label="课时排序"> 
+                    <el-input-number  v-model="video.sort" :min="0" :max="1" controls-position="right"/>
                 </el-form-item>
-                <el-form-item label="是否免费" prop="是否免费"> 
+                <el-form-item label="是否免费"> 
                     <el-radio-group v-model="video.isFree"> 
                         <el-radio :label="1">免费</el-radio> 
                         <el-radio :label="0">默认</el-radio>
@@ -120,12 +120,13 @@ import vod from '@/api/vod'
 export default {
     data() {
         return {
+            testInput: "hello input",
             saveBtnDisabled: false,
             chapterVideoList: [],
             chapterId: '',
             courseId: '',
             dialogChapterFormVisible: false,
-            addVideoFlag: false,
+            addFlag: false,
             chapterInfo: {
                 title: '',
                 sort: '',
@@ -144,7 +145,7 @@ export default {
             dialogVideoFormVisible: false,
             saveVideoBtnDisabled: false,
             //添加小节或者编辑小节的标志
-            addFlag: false,
+            addVideoFlag: false,
             BASE_API: process.env.VUE_APP_VOD_BASE_API,
             fileList: [],//小节中上传视频文件列表
         }
@@ -240,15 +241,26 @@ export default {
                         message: '删除章节成功'
                     })
                 })
-            this.getChapterVideo()
+            //1.this.getChapterVideo()
             
         },
         /******************************小节操作**************************************/
         //打开增加课时的对话框
         openVideoDialog(chapterId) {
+            console.log("1-------")
+            console.log(this.video)
+
+            this.video.title = ''
+            this.video.sort = 0
+            this.video.isFree = 0
+            this.video.videoSourceId = ''
+            this.video.videoOriginalName = ''
+
             this.dialogVideoFormVisible = true
             this.video.chapterId = chapterId
             this.addVideoFlag = true
+            console.log("2======")
+            console.log(this.addVideoFlag)
         },
 
         //增加课时的执行函数
@@ -263,31 +275,26 @@ export default {
                     })
                     this.getChapterVideo()
                 })
-            this.addFlag = false
-            this.video = {}
+            this.addVideoFlag = false
+            
         },
 
         saveOrUpdateVideo() {
             if(this.addVideoFlag) {
                 this.addVideo()
             } else {
-                // this.editVideo()
-                // this.videoCopy.title = this.video.title
-                // this.videoCopy.sort = this.video.sort
-                // this.videoCopy.isFree = this.video.isFree
-
                 video.updateVideo(this.video)
                     .then(response => {
                         this.$message({
                             type: 'success',
                             message: '编辑课时成功'
                         })
+                        this.dialogVideoFormVisible = false
+
                     })
-                this.video = {}
+                // this.video = {}
             }
-            this.dialogVideoFormVisible = false
             course.getCourseInfo(this.courseId)
-            // this.$refs['videoFormRef'].resetFields()
         },
 
         closeVideoDialog() {
@@ -329,8 +336,8 @@ export default {
                         type: 'warn',
                         message: '删除课时成功'
                     })
+                    this.getChapterVideo()
                 })
-            this.getChapterVideo()
         },
 
         //成功回调
