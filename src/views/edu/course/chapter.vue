@@ -66,7 +66,7 @@
         </el-dialog>
 
         <!-- 添加和修改课时表单 -->
-        <el-dialog :visible.sync="dialogVideoFormVisible" title="添加课时" @close="closeVideoDialog">
+        <el-dialog :visible.sync="dialogVideoFormVisible" title="添加课时" @closed="closeVideoDialog">
             <el-form  :model="video" ref="videoFormRef" label-width="120px">
                 <el-form-item label="课时标题"> 
                     <el-input v-model="video.title"/>
@@ -82,6 +82,7 @@
                 </el-form-item>
                 <el-form-item label="上传视频" prop="上传视频">
                     <el-upload
+                        ref="upload"
                         :on-success="handleVodUploadSuccess"
                         :on-remove="handleVodRemove"
                         :before-remove="beforeVodRemove"
@@ -253,11 +254,6 @@ export default {
             console.log("1-------")
             console.log(this.video)
 
-            this.video.title = ''
-            this.video.sort = 0
-            this.video.isFree = 0
-            this.video.videoSourceId = ''
-            this.video.videoOriginalName = ''
 
             this.dialogVideoFormVisible = true
             this.video.chapterId = chapterId
@@ -293,19 +289,21 @@ export default {
                             message: '编辑课时成功'
                         })
                         this.dialogVideoFormVisible = false
-
+                        // course.getCourseInfo(this.courseId)
+                        this.getChapterVideo()
                     })
                 // this.video = {}
             }
-            course.getCourseInfo(this.courseId)
+            // course.getCourseInfo(this.courseId)
         },
 
         closeVideoDialog() {
             //重置表单
-            this.$refs.videoFormRef.resetFields()
+            // this.$refs.videoFormRef.resetFields()
             this.video.title = ''
             this.video.sort = 0
             this.video.isFree = 0
+            this.fileList = []
         },
 
         //根据id查询课时
@@ -358,12 +356,15 @@ export default {
         },
 
         handleVodRemove(file, fileList) {
-            vod.deleteAliyunVideo(this.video.videoSourceId).then(response=>{
-                this.$message({
-                type: 'success',
-                message: response.message
-                })
-            })
+            vod.deleteAliyunVideo(this.video.videoSourceId)
+                    .then(response=>{
+                            this.$message({
+                            type: 'success',
+                            message: response.message
+                        })
+                        this.$refs.upload.clearFiles()
+                        //TODO:删除edu_video表中的video_source_id字段
+                    })
         }
 
 
